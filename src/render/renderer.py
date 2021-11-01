@@ -10,6 +10,7 @@ class Renderer:
 
         self.type_to_sprite = {
             "Player": self.entities_sheet.image_at((164, 88, 49, 43), -1),
+            "Zombie": self.entities_sheet.image_at((424, 0, 35, 43), -1),
         }
 
     def draw_scene(self, scene):

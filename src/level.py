@@ -1,4 +1,5 @@
 # instances
+from instances.humanoid.enemy.Zombie import Zombie
 from instances.humanoid.player.Player import Player
 
 # defaults
@@ -6,9 +7,7 @@ default_level = "test"
 premade_levels = {
     "test": {
         "player": {"position": [300.0, 400.0], "rotation":-110.0},
-        "enemies": {
-            "positions": [[90.0,90.0], [100.0, 200.0], [250.0, 300.0], [100.0, 40.0]],
-        },
+        "zombies": [[90.0,90.0], [100.0, 200.0], [250.0, 300.0], [100.0, 40.0]]
     },
 }
 
@@ -23,6 +22,9 @@ class Level:
 
     def load_scene(self):
         print(self.data)
-        self.scene = {
+        self.scene = [
             Player("Player", self.data["player"]["position"], self.data["player"]["rotation"], 100),
-        }
+        ]
+
+        for pos in self.data["zombies"]:
+            self.scene.append(Zombie("Zombie", pos, 0.0, 100))

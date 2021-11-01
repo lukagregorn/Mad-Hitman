@@ -5,7 +5,7 @@ class Settings:
         self._version = 1
 
         # screen
-        self.screen_width = 800
+        self.screen_width = 600
         self.screen_height = 800
 
         self.window_caption = f"Mad Gunner (V{self._version})"
