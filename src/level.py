@@ -7,7 +7,7 @@ default_level = "test"
 premade_levels = {
     "test": {
         "player": {"position": [300.0, 400.0], "rotation":-110.0},
-        "zombies": [[90.0,90.0], [100.0, 200.0], [250.0, 300.0], [100.0, 40.0]]
+        "zombies": [[100.0, 100.0]]
     },
 }
 
@@ -21,10 +21,12 @@ class Level:
             self.data = premade_levels[level]
 
     def load_scene(self):
-        print(self.data)
-        self.scene = [
-            Player("Player", self.data["player"]["position"], self.data["player"]["rotation"], 100),
-        ]
+        self.scene = []
+
+        player = Player("Player", self.data["player"]["position"], self.data["player"]["rotation"], 100)
+        self.scene.append(player)
 
         for pos in self.data["zombies"]:
-            self.scene.append(Zombie("Zombie", pos, 0.0, 100))
+            new_zombie = Zombie("Zombie", pos, 0.0, 100)
+            new_zombie.set_target(player)
+            self.scene.append(new_zombie)

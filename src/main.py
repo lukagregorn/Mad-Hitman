@@ -1,5 +1,6 @@
 # system
 import sys, pygame, os
+from pygame.locals import *
 
 # services
 from settings import Settings
@@ -43,35 +44,14 @@ class MadGunner:
 
     def _check_events(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == QUIT:
                 sys.exit()
-
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT or event.key == ord('a'):
-                    print('left')
-                if event.key == pygame.K_RIGHT or event.key == ord('d'):
-                    print('right')
-                if event.key == pygame.K_UP or event.key == ord('w'):
-                    print('up')
-                if event.key == pygame.K_DOWN or event.key == ord('s'):
-                    print('down')
-
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT or event.key == ord('a'):
-                    print('left stop')
-                if event.key == pygame.K_RIGHT or event.key == ord('d'):
-                    print('right stop')
-                if event.key == pygame.K_UP or event.key == ord('w'):
-                    print('up stop')
-                if event.key == pygame.K_DOWN or event.key == ord('s'):
-                    print('down stop')
 
 
     def _update(self, dt):
         for object in self.current_level.scene:
             object._update(dt)
                 
-
 
     def _render(self):
         self.screen.fill((255,255,255))
