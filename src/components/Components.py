@@ -80,15 +80,18 @@ class RigidComponent:
 
 
 class GunComponent:
-    def __init__(self, transform, fire_rate=0.5, semi_auto=True):
+    def __init__(self, only_hit_types, transform, fire_rate=0.5, semi_auto=True, projectile_type="YELLOW"):
 
         if not transform:
             return None
         
         self.transform = transform
 
+        # filter
+        self.only_hit_types = only_hit_types
+
         # initial values
-    
+        self.projectile_type = projectile_type
         self.semi_auto = semi_auto
         self.is_ready = True # used for semi auto
 
@@ -128,6 +131,8 @@ class GunComponent:
             "target": target,
             "position": [self.transform.position[0] + dir[0], self.transform.position[1] + dir[1]],
             "parent_transform": self.transform,
+            "only_hit_types": self.only_hit_types,
+            "projectile_type": self.projectile_type,
         }
 
         self._projectiles_to_spawn.append(data)

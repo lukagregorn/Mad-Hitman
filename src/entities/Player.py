@@ -1,12 +1,16 @@
+from typing import Sized
 import pygame
 import pygame.mouse as mouse
 
 from ..components.Components import HealthComponent, TransformComponent, RigidComponent, GunComponent
+from ..render.renderer import Renderer
+
 
 # player class
 class Player():
     
     _type = "Player"
+    scale = (1.1, 1.1)
 
     def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=100, speed=120):
 
@@ -15,7 +19,9 @@ class Player():
         self.transform = TransformComponent(position, rotation)
         self.rigidBody = RigidComponent(self.transform, speed)
         
-        self.gun = GunComponent(self.transform, fire_rate=0.1, semi_auto=False)
+        self.gun = GunComponent(["Gunner", "Zombie", "SelfDestructor"], self.transform, fire_rate=0.1, semi_auto=False, projectile_type="YELLOW")
+
+        self.size = (self.scale[0] * Renderer.image_cords[self._type][2], self.scale[1] * Renderer.image_cords[self._type][3])
 
         self.destroyed = False
 

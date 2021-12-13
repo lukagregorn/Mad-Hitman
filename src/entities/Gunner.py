@@ -1,30 +1,32 @@
-from ..components.Components import HealthComponent, TransformComponent, RigidComponent
+from ..components.Components import HealthComponent, TransformComponent, RigidComponent, GunComponent
 from ..render.renderer import Renderer
 
 from math import sqrt
 
-# zombie class
-class Zombie():
+# Gunner class
+class Gunner():
     
-    _type = "Zombie"
+    _type = "Gunner"
     scale = (1.1, 1.1)
 
-    def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=100, speed=50):
+    def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=100, speed=30):
         self.health = HealthComponent(self.on_death, max_health)
         
         self.transform = TransformComponent(position, rotation)
         self.rigidBody = RigidComponent(self.transform, speed)
 
-        self.min_target_range = 200
-        self.target = False
+        self.gun = GunComponent(["Player"], self.transform, fire_rate=1.5, semi_auto=False, projectile_type="RED")
 
+        self.min_target_range = 500
+        self.target = False
+        
         self.size = (self.scale[0] * Renderer.image_cords[self._type][2], self.scale[1] * Renderer.image_cords[self._type][3])
 
         self.destroyed = False
 
 
     def __str__(self):
-        return f"Zombie: {self.name}"
+        return f"Gunner: {self.name}"
 
 
     def _update(self, dt):
@@ -34,6 +36,7 @@ class Zombie():
 
             self.rigidBody.update_position(dt)
 
+            self.gun.shoot(self.target.transform.position)
         else:
             self.rigidBody.stand_still()
 

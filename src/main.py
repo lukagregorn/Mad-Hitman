@@ -10,8 +10,6 @@ from .physics.collision_detection import circle_circle_collision
 
 # instancces
 from .entities.Projectile import Projectile
-from .entities.Player import Player
-from .entities.Zombie import Zombie
 
 
 class MadGunner:
@@ -26,7 +24,6 @@ class MadGunner:
         pygame.display.set_caption(self.settings.window_caption)
 
         self.renderer = Renderer(self.screen)
-        self.renderer.set_class_sizes([Projectile, Player, Zombie])
 
     
     def run_game(self):
@@ -86,7 +83,7 @@ class MadGunner:
             if (len(projectiles) > 0):
                 for projectile in projectiles:
 
-                    new_projecitle = Projectile(projectile["position"], projectile["target"], parent_transform=projectile["parent_transform"])
+                    new_projecitle = Projectile(projectile["position"], projectile["target"], only_hit_types=projectile["only_hit_types"], parent_transform=projectile["parent_transform"], projectile_type=projectile["projectile_type"])
                     self.current_level.add_projectile(new_projecitle)
 
             object.gun._projectiles_to_spawn = []

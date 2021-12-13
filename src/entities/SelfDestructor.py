@@ -3,19 +3,20 @@ from ..render.renderer import Renderer
 
 from math import sqrt
 
-# zombie class
-class Zombie():
+# SelfDestructor class
+class SelfDestructor():
     
-    _type = "Zombie"
-    scale = (1.1, 1.1)
+    _type = "SelfDestructor"
+    scale = (0.8, 0.8)
 
-    def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=100, speed=50):
+    def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=30, speed=140, damage=15):
         self.health = HealthComponent(self.on_death, max_health)
         
         self.transform = TransformComponent(position, rotation)
-        self.rigidBody = RigidComponent(self.transform, speed)
+        self.rigidBody = RigidComponent(self.transform, speed, on_touch=self.on_touch)
 
-        self.min_target_range = 200
+        self.min_target_range = 300
+        self.damage = damage
         self.target = False
 
         self.size = (self.scale[0] * Renderer.image_cords[self._type][2], self.scale[1] * Renderer.image_cords[self._type][3])
@@ -24,7 +25,7 @@ class Zombie():
 
 
     def __str__(self):
-        return f"Zombie: {self.name}"
+        return f"SelfDestructor: {self.name}"
 
 
     def _update(self, dt):
@@ -60,3 +61,14 @@ class Zombie():
     def on_death(self):
         print("dead")
         self.destroyed = True
+
+
+    def on_touch(self, other):
+        if other.transform is self.transform:
+            return
+
+        if other._type == "Player":
+            self.destroyed = True
+
+            if hasattr(other, "health"):
+                other.health.take_damage(self.damage)
