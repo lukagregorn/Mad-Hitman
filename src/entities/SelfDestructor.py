@@ -1,3 +1,6 @@
+import os
+from pygame import mixer
+
 from ..components.Components import HealthComponent, TransformComponent, RigidComponent
 from ..render.renderer import Renderer
 
@@ -69,6 +72,9 @@ class SelfDestructor():
 
         if other._type == "Player":
             self.destroyed = True
+
+            sound = mixer.Sound(os.path.join("assets", "explosion.wav"))
+            mixer.Sound.play(sound)
 
             if hasattr(other, "health"):
                 other.health.take_damage(self.damage)

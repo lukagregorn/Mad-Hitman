@@ -1,4 +1,4 @@
-import pygame
+import pygame, os
 from math import atan2, pi, sqrt
 from pygame.time import wait
 
@@ -28,6 +28,9 @@ class HealthComponent:
 
     def take_damage(self, damage):
         self.health -= damage
+
+        sound = pygame.mixer.Sound(os.path.join("assets", "hit.wav"))
+        pygame.mixer.Sound.play(sound)
 
         if self.health <= 0:
             self.on_death()

@@ -1,3 +1,6 @@
+import os
+from pygame import mixer
+
 from ..components.Components import TransformComponent, RigidComponent
 from ..render.renderer import Renderer
 
@@ -8,6 +11,7 @@ PROJECTILE_TYPES = {
         "damage": 10,
         "scale": (0.7, 0.7),
         "_type": "ProjectileYellow",
+        "sound": "shoot1.wav",
     },
 
     "RED": {
@@ -15,6 +19,7 @@ PROJECTILE_TYPES = {
         "damage": 5,
         "scale": (1.2, 1.2),
         "_type": "ProjectileRed",
+        "sound": "shoot2.wav",
     },
 }
 
@@ -40,6 +45,10 @@ class Projectile():
 
         self.parent_transform = parent_transform
         self.destroyed = False
+
+        # play sound
+        sound = mixer.Sound(os.path.join("assets", PROJECTILE_TYPES[projectile_type]["sound"]))
+        mixer.Sound.play(sound)
 
     def _update(self, dt):
         self.rigidBody.update_position(dt)
