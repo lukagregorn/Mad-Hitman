@@ -14,7 +14,7 @@ class Player():
 
     def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=100, speed=120):
 
-        self.health = HealthComponent(self.on_death, max_health)
+        self.health = HealthComponent(self.on_death, max_health, self.on_health_changed)
         
         self.transform = TransformComponent(position, rotation)
         self.rigidBody = RigidComponent(self.transform, speed)
@@ -24,6 +24,7 @@ class Player():
         self.size = (self.scale[0] * Renderer.image_cords[self._type][2], self.scale[1] * Renderer.image_cords[self._type][3])
 
         self.destroyed = False
+        self.on_health_changed(self.health.health)
 
 
     def __str__(self):
@@ -51,3 +52,7 @@ class Player():
 
     def on_death(self):
         self.destroyed = True
+        pygame.event.post(pygame.event.Event(pygame.USEREVENT, {"user_type": "PLAYER_DIED"}))
+
+    def on_health_changed(self, new_health):
+        pygame.event.post(pygame.event.Event(pygame.USEREVENT, {"user_type": "HEALTH_CHANGED", "player_health": new_health}))

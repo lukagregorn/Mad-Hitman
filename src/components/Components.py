@@ -1,5 +1,6 @@
 import pygame, os
 from math import atan2, pi, sqrt
+from random import uniform
 from pygame.time import wait
 
 
@@ -18,21 +19,25 @@ class AnimationComponent:
 
 
 class HealthComponent:
-    def __init__(self, on_death, max_health):
+    def __init__(self, on_death, max_health, on_health_changed=None):
         self.max_health = max_health
         self.health = max_health
 
         # callback function on death
         self.on_death = on_death
+        self.on_health_changed = on_health_changed
 
 
     def take_damage(self, damage):
         self.health -= damage
 
+        if self.on_health_changed:
+            self.on_health_changed(self.health)
+
         sound = pygame.mixer.Sound(os.path.join("assets", "hit.wav"))
         pygame.mixer.Sound.play(sound)
 
-        if self.health <= 0:
+        if self.health <= 0 and self.on_death:
             self.on_death()
 
 
@@ -83,7 +88,7 @@ class RigidComponent:
 
 
 class GunComponent:
-    def __init__(self, only_hit_types, transform, fire_rate=0.5, semi_auto=True, projectile_type="YELLOW"):
+    def __init__(self, only_hit_types, transform, fire_rate=0.5, semi_auto=True, projectile_type="YELLOW", recoil=50):
 
         if not transform:
             return None
@@ -100,6 +105,7 @@ class GunComponent:
 
         self.can_shoot = 0
         self.fire_rate = fire_rate
+        self.recoil = recoil
 
         # projectiles to generate
         self._projectiles_to_spawn = []
@@ -129,6 +135,7 @@ class GunComponent:
         dir_len = sqrt(dir_x ** 2 + dir_y ** 2)
         scale = 30
         dir = [dir_x/dir_len * scale, dir_y/dir_len * scale]
+        target = [target[0] + uniform(-1.0, 1.0)*self.recoil, target[1] + uniform(-1.0, 1.0)*self.recoil]
 
         data = {
             "target": target,

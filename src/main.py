@@ -1,9 +1,10 @@
 # system
-import sys, pygame, os
+import sys, os, pygame
 from pygame.locals import *
 
 # services
 from .settings import Settings
+from .gui import Gui
 from .level import Level
 from .render.renderer import Renderer
 from .physics.collision_detection import circle_circle_collision
@@ -12,30 +13,39 @@ from .physics.collision_detection import circle_circle_collision
 from .entities.Projectile import Projectile
 
 
+class GameState:
+    def __init__(self):
+        self.paused = False
+        self.menu = True
+        self.restart = False
+
+
 class MadGunner:
 
     def __init__(self):
         
         pygame.init()
+        self.game_state = GameState()
         
-        self.settings = Settings()
-
-        self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
-        pygame.display.set_caption(self.settings.window_caption)
+        self.screen = pygame.display.set_mode((Settings.screen_width, Settings.screen_height))
+        self.gui = Gui(self.screen, self.game_state)
+        pygame.display.set_caption(Settings.window_caption)
 
         self.renderer = Renderer(self.screen)
 
-    
+        
     def run_game(self):
         self._game_clock = pygame.time.Clock()
         self._setup_level("test")
 
         while True:
             self._check_events()
-            self._update(self.settings.dt)
-            self._render()
+            
+            if not self.game_state.menu and not self.game_state.paused:
+                self._update(Settings.dt)
 
-            self._game_clock.tick(self.settings.fps)
+            self._render()
+            self._game_clock.tick(Settings.fps)
 
 
     def _setup_level(self, level):
@@ -47,6 +57,8 @@ class MadGunner:
         for event in pygame.event.get():
             if event.type == QUIT:
                 sys.exit()
+            
+            self.gui.process_event(event)
 
 
     def _update(self, dt):
@@ -91,7 +103,7 @@ class MadGunner:
 
     def _render(self):
         self.screen.fill((255,255,255))
-
         self.renderer.draw_scene(self.current_level.scene)
 
+        self.gui.update()
         pygame.display.flip()
