@@ -3,16 +3,21 @@ from .entities.Player import Player
 from .entities.Zombie import Zombie
 from .entities.Gunner import Gunner
 from .entities.SelfDestructor import SelfDestructor
+from .entities.Tile import Tile
 
 
 # defaults
 default_level = "test"
 premade_levels = {
     "test": {
-        "player": {"position": [300.0, 500.0], "rotation":-110.0},
+        "player": {"position": [300.0, 550.0], "rotation":-110.0},
         "zombies": [[100.0, 100.0], [200.0, 100.0],],
         "gunners": [[140.0, 150.0], [240.0, 140.0],],
         "self_destructors": [[150.0, 160.0], [260.0, 160.0],],
+
+        "map_tiles": {
+            "GrassTile": [[300.0, 300.0]],
+        },
     },
 }
 
@@ -27,6 +32,7 @@ class Level:
 
     def load_scene(self):
         self.scene = {
+            "MAP": set(),
             "TO_DRAW": set(),
             "PLAYER": set(),
             "ENEMIES": set(),
@@ -35,7 +41,7 @@ class Level:
         }
 
         player = Player(self.data["player"]["position"], self.data["player"]["rotation"])
-        print(player.size)
+        #print(player.size)
         self.scene["PLAYER"].add(player)
         self.scene["TO_DRAW"].add(player)
         self.scene["COLLIDABLE"].add(player)
@@ -63,6 +69,12 @@ class Level:
             self.scene["ENEMIES"].add(new_self_destructor)
             self.scene["COLLIDABLE"].add(new_self_destructor)
 
+
+        for tile_type, positions in self.data["map_tiles"].items():
+            for pos in positions:
+                new_tile = Tile(pos, 0.0, _type=tile_type)
+                self.scene["MAP"].add(new_tile)
+                self.scene["COLLIDABLE"].add(new_tile)
     
     def add_projectile(self, projectile):
         self.scene["TO_DRAW"].add(projectile)

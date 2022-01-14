@@ -7,7 +7,7 @@ from .settings import Settings
 from .gui import Gui
 from .level import Level
 from .render.renderer import Renderer
-from .physics.collision_detection import circle_circle_collision
+from .physics.collision_detection import collision_detection
 
 # instancces
 from .entities.Projectile import Projectile
@@ -67,12 +67,17 @@ class MadGunner:
             object._update(dt)
 
         # check collisions
-        for object1 in self.current_level.scene["COLLIDABLE"]:
+        for object1 in self.current_level.scene["COLLIDABLE"] | self.current_level.scene["MAP"]:
+
+            # only check active objects as obj1 (we dont want to check static with static ever)
+            if object1.rigidBody.static:
+                continue
+
             for object2 in self.current_level.scene["COLLIDABLE"]:
                 if object1 is object2:
                     continue
                 
-                circle_circle_collision(object1, object2)
+                collision_detection(object1, object2)
 
         # check for destroyed
         to_destroy = []

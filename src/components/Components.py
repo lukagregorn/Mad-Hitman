@@ -3,6 +3,8 @@ from math import atan2, pi, sqrt
 from random import uniform
 from pygame.time import wait
 
+from ..settings import Settings
+
 
 class SpriteComponent:
     def __init__(self, surface, initial_x, initial_y):
@@ -48,7 +50,7 @@ class TransformComponent:
 
 
 class RigidComponent:
-    def __init__(self, transform, speed=40, canCollide=True, on_touch=None, static=False):
+    def __init__(self, transform, speed=40, canCollide=True, on_touch=None, static=False, clamp_to_screen=False):
 
         if not transform:
             return None
@@ -58,10 +60,12 @@ class RigidComponent:
         # initial values
         self.velocity = [0, 0]
         self.speed = speed
+        self.last_position_change = [0,0]
 
         self.on_touch = on_touch
         self.canCollide = canCollide
         self.static = static
+        self.clamp_to_screen = clamp_to_screen
 
 
     def rotate_towards_point(self, target_point):
@@ -84,8 +88,12 @@ class RigidComponent:
 
 
     def update_position(self, dt):
-        self.transform.position = [self.transform.position[0] + self.velocity[0]*self.speed*dt, self.transform.position[1] + self.velocity[1]*self.speed*dt]
+        self.last_position_change = [self.velocity[0]*self.speed*dt, self.velocity[1]*self.speed*dt]
+        self.transform.position = [self.transform.position[0] + self.last_position_change[0], self.transform.position[1] + self.last_position_change[1]]
+        if (self.clamp_to_screen):
 
+            self.transform.position[0] = min(max(0, self.transform.position[0]), Settings.screen_width)
+            self.transform.position[1] = min(max(0, self.transform.position[1]), Settings.screen_height)
 
 class GunComponent:
     def __init__(self, only_hit_types, transform, fire_rate=0.5, semi_auto=True, projectile_type="YELLOW", recoil=50):

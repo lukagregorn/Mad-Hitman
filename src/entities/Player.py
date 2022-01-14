@@ -10,6 +10,9 @@ from ..render.renderer import Renderer
 class Player():
     
     _type = "Player"
+    _collider = 1 #CIRCLE
+
+    collider_scale = 0.925
     scale = (1.1, 1.1)
 
     def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=100, speed=120):
@@ -17,7 +20,7 @@ class Player():
         self.health = HealthComponent(self.on_death, max_health, self.on_health_changed)
         
         self.transform = TransformComponent(position, rotation)
-        self.rigidBody = RigidComponent(self.transform, speed)
+        self.rigidBody = RigidComponent(self.transform, speed, clamp_to_screen=True)
         
         self.gun = GunComponent(["Gunner", "Zombie", "SelfDestructor"], self.transform, fire_rate=0.1, semi_auto=False, projectile_type="YELLOW")
 

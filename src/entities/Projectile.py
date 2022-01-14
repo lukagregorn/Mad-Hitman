@@ -3,6 +3,7 @@ from pygame import mixer
 
 from ..components.Components import TransformComponent, RigidComponent
 from ..render.renderer import Renderer
+from ..settings import Settings
 
 
 PROJECTILE_TYPES = {
@@ -27,6 +28,9 @@ PROJECTILE_TYPES = {
 class Projectile():
     
     _type = "Projectile"
+    _collider = 1 #CIRCLE
+
+    collider_scale = 1.0
 
     def __init__(self, position=[0.0,0.0], target=[0.0,0.0], only_hit_types=[], parent_transform=None, projectile_type="YELLOW"):
         self.transform = TransformComponent(position)
@@ -52,6 +56,11 @@ class Projectile():
 
     def _update(self, dt):
         self.rigidBody.update_position(dt)
+
+        # check out of screen
+        pos = self.rigidBody.transform.position
+        if (pos[1] > Settings.screen_height or pos[1] < 0 or pos[0] > Settings.screen_width or pos[0] < 0):
+            self.destroyed = True
 
 
     def on_touch(self, other):

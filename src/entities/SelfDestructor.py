@@ -10,6 +10,9 @@ from math import sqrt
 class SelfDestructor():
     
     _type = "SelfDestructor"
+    _collider = 1 #CIRCLE
+
+    collider_scale = 0.925
     scale = (0.8, 0.8)
 
     def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=30, speed=140, damage=15):

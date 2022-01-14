@@ -7,6 +7,9 @@ from math import sqrt
 class Zombie():
     
     _type = "Zombie"
+    _collider = 1 #CIRCLE
+
+    collider_scale = 0.925
     scale = (1.1, 1.1)
 
     def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=100, speed=50):
