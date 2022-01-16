@@ -17,6 +17,9 @@ class Renderer:
 
         # tiles
         "GrassTile": (0, 128, 128, 128),
+
+        # backgrounds
+        "BackgroundYellow": (0, 0, 600, 800),
     }
     
     def __init__(self, screen):
@@ -24,6 +27,7 @@ class Renderer:
 
         self.entities_sheet = SpriteSheet(os.path.join("assets", "spritesheet_characters.png"))
         self.tank_sheet = SpriteSheet(os.path.join("assets", "sheet_tanks.png"))
+        self.backgrounds = SpriteSheet(os.path.join("assets", "backgrounds.png"))
         self.type_to_sprite = {
             "Player": [self.entities_sheet.image_at(self.image_cords["Player"], -1), 0],
             "Zombie": [self.entities_sheet.image_at(self.image_cords["Zombie"], -1), 0],
@@ -34,6 +38,8 @@ class Renderer:
             "ProjectileRed": [self.tank_sheet.image_at(self.image_cords["ProjectileRed"], -1), -90],
 
             "GrassTile": [self.tank_sheet.image_at(self.image_cords["GrassTile"], None), 0],
+
+            "BackgroundYellow": [self.backgrounds.image_at(self.image_cords["BackgroundYellow"], None), 0],
         }
 
 
@@ -51,8 +57,18 @@ class Renderer:
 
 
     def draw_scene(self, scene):
+
+        # draw background
+        for background in scene["BACKGROUND"]:
+            sprite_data = self.type_to_sprite[background]
+            sprite = sprite_data[0]
+
+            rect = sprite.get_rect()
+            rect.topleft = 0,0
+            self.screen.blit(sprite, rect)
+
         
-        # draw the map first
+        # draw the map
         for object in scene["MAP"]:
             if object._type in self.type_to_sprite:
                 self.draw_object(object)

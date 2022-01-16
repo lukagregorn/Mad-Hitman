@@ -15,7 +15,7 @@ class SelfDestructor():
     collider_scale = 0.925
     scale = (0.8, 0.8)
 
-    def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=30, speed=140, damage=15):
+    def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=30, speed=140, damage=15, raycaster=None):
         self.health = HealthComponent(self.on_death, max_health)
         
         self.transform = TransformComponent(position, rotation)
@@ -26,6 +26,7 @@ class SelfDestructor():
         self.target = False
 
         self.size = (self.scale[0] * Renderer.image_cords[self._type][2], self.scale[1] * Renderer.image_cords[self._type][3])
+        self.raycaster = raycaster
 
         self.destroyed = False
 
@@ -35,7 +36,7 @@ class SelfDestructor():
 
 
     def _update(self, dt):
-        if self.is_target_in_range():
+        if self.is_target_in_range() and self.can_see_target():
             self.rigidBody.rotate_towards_point(self.target.transform.position)
             self.rigidBody.move_towards_point(self.target.transform.position)
 
@@ -52,6 +53,13 @@ class SelfDestructor():
 
             return sqrt(dist_x ** 2 + dist_y ** 2) <= self.min_target_range
         
+        return False
+
+
+    def can_see_target(self):
+        if self.target:
+            return self.raycaster.check_if_path_clear(self.transform.position, self.target.transform.position)
+
         return False
 
 
