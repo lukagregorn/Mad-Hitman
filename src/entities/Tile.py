@@ -9,7 +9,7 @@ from math import sqrt
 # SelfDestructor class
 class Tile():
     
-    _type = "GrassTile"
+    _type = "Box"
     _collider = 0 #RECT
     
     _destroy_on_touch = {"ProjectileYellow", "ProjectileRed"}
@@ -17,7 +17,7 @@ class Tile():
     collider_scale = 1.0
     scale = (1.0, 1.0)
 
-    def __init__(self, position=[0.0,0.0], rotation=0.0, _type="GrassTile"):
+    def __init__(self, position=[0.0,0.0], rotation=0.0, _type="Box"):
         
         self._type = _type
 

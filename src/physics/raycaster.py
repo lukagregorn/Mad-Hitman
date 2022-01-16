@@ -1,7 +1,8 @@
 class Raycaster:
 
-    def __init__(self, map):
+    def __init__(self, map, enemies):
         self.map = map
+        self.enemies = enemies
 
 
     def ccw(self, A,B,C):
@@ -28,3 +29,19 @@ class Raycaster:
                 return False
 
         return True
+
+
+    def find_visible_enemy(self, pos):
+        min_distance = 999999
+        enemy = None
+
+        for enemy_obj in self.enemies:
+            dist_x = pos[0] - enemy_obj.transform.position[0]
+            dist_y = pos[1] - enemy_obj.transform.position[1]
+
+            dist_sq = dist_x ** 2 + dist_y ** 2
+            if dist_sq < min_distance and self.check_if_path_clear(pos, enemy_obj.transform.position):
+                enemy = enemy_obj
+                min_distance = dist_sq
+
+        return enemy

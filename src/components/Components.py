@@ -68,8 +68,12 @@ class RigidComponent:
         self.clamp_to_screen = clamp_to_screen
 
 
-    def rotate_towards_point(self, target_point):
-        self.transform.rotation = 360 - atan2(target_point[1] - self.transform.position[1], target_point[0] - self.transform.position[0]) *180/pi
+    def rotate_towards_point(self, target_point, negate=False):
+        new_rot = 360 - atan2(target_point[1] - self.transform.position[1], target_point[0] - self.transform.position[0]) *180/pi
+        if negate:
+            self.transform.rotation = 180 + new_rot
+        else:
+            self.transform.rotation = new_rot
 
 
     def move_towards_point(self, target_point):

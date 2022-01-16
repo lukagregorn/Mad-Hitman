@@ -17,15 +17,20 @@ class Renderer:
 
         # tiles
         "GrassTile": (0, 128, 128, 128),
+        "Box": (1485, 301, 54, 54),
 
         # backgrounds
         "BackgroundYellow": (0, 0, 600, 800),
+        "BackgroundGreen": (600, 800, 600, 800),
+        "BackgroundRed": (600, 0, 600, 800),
+        "BackgroundBlue": (0, 800, 600, 800),
     }
     
     def __init__(self, screen):
         self.screen = screen
 
         self.entities_sheet = SpriteSheet(os.path.join("assets", "spritesheet_characters.png"))
+        self.spritesheet_tiles = SpriteSheet(os.path.join("assets", "spritesheet_tiles.png"))
         self.tank_sheet = SpriteSheet(os.path.join("assets", "sheet_tanks.png"))
         self.backgrounds = SpriteSheet(os.path.join("assets", "backgrounds.png"))
         self.type_to_sprite = {
@@ -38,8 +43,12 @@ class Renderer:
             "ProjectileRed": [self.tank_sheet.image_at(self.image_cords["ProjectileRed"], -1), -90],
 
             "GrassTile": [self.tank_sheet.image_at(self.image_cords["GrassTile"], None), 0],
+            "Box": [self.spritesheet_tiles.image_at(self.image_cords["Box"], None), 0],
 
             "BackgroundYellow": [self.backgrounds.image_at(self.image_cords["BackgroundYellow"], None), 0],
+            "BackgroundGreen": [self.backgrounds.image_at(self.image_cords["BackgroundGreen"], None), 0],
+            "BackgroundRed": [self.backgrounds.image_at(self.image_cords["BackgroundRed"], None), 0],
+            "BackgroundBlue": [self.backgrounds.image_at(self.image_cords["BackgroundBlue"], None), 0],
         }
 
 
