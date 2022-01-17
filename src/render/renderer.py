@@ -19,6 +19,8 @@ class Renderer:
         "GrassTile": (0, 128, 128, 128),
         "Box": (1485, 301, 54, 54),
 
+        "Spawnpoint": (1634, 819, 54, 54),
+
         # backgrounds
         "BackgroundYellow": (0, 0, 600, 800),
         "BackgroundGreen": (600, 800, 600, 800),
@@ -44,6 +46,8 @@ class Renderer:
 
             "GrassTile": [self.tank_sheet.image_at(self.image_cords["GrassTile"], None), 0],
             "Box": [self.spritesheet_tiles.image_at(self.image_cords["Box"], None), 0],
+
+            "Spawnpoint": [self.spritesheet_tiles.image_at(self.image_cords["Spawnpoint"], -1), 0],
 
             "BackgroundYellow": [self.backgrounds.image_at(self.image_cords["BackgroundYellow"], None), 0],
             "BackgroundGreen": [self.backgrounds.image_at(self.image_cords["BackgroundGreen"], None), 0],
@@ -79,6 +83,12 @@ class Renderer:
         
         # draw the map
         for object in scene["MAP"]:
+            if object._type in self.type_to_sprite:
+                self.draw_object(object)
+
+
+        # draw spawnpoints
+        for object in scene["SPAWNPOINTS"]:
             if object._type in self.type_to_sprite:
                 self.draw_object(object)
                 

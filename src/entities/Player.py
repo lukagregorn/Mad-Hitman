@@ -76,3 +76,8 @@ class Player():
 
     def set_raycaster(self, raycaster=None):
         self.raycaster = raycaster
+
+    def reset_position(self, position, rotation):
+        self.last_rot_vec = [0,0]
+        self.transform.position = position
+        self.transform.rotation = rotation
