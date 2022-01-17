@@ -10,15 +10,11 @@ from .entities.Spawnpoint import Spawnpoint
 from .physics.raycaster import Raycaster
 from .render.renderer import Renderer
 
-from random import choice, sample
+from random import choice, randrange, sample
 
 
 # level generation data
-enemy_types = {
-    "Zombie": {"min_stage":0, "class": Zombie},
-    "Gunner": {"min_stage":0, "class": Gunner},
-    "SelfDestructor": {"min_stage":0, "class": SelfDestructor},
-}
+enemy_types = (Zombie, Gunner, SelfDestructor)
 
 background_types = [
     "BackgroundYellow",
@@ -101,8 +97,13 @@ class Level:
         self.scene = None
 
 
-    def load_scene(self):
+    def load_scene(self, game_state):
         self.destroy_scene()
+        game_state.stage += 1
+        game_state.current_enemies = 0
+        game_state.enemies_left = 5 + int(game_state.stage * 1.35)
+        game_state.max_enemies = 2 + int(1.1 ** game_state.stage)
+
         self.data = self.generate_level()
 
         self.scene = {
@@ -134,29 +135,7 @@ class Level:
         self.player.set_raycaster(self.raycaster) # give player a new raycaster
 
         self.scene["BACKGROUND"].add(self.data["background"])
-        '''
-        for pos in self.data["zombies"]:
-            new_zombie = Zombie(pos, 0.0, raycaster=self.raycaster)
-            new_zombie.set_target(self.player)
-            self.scene["TO_DRAW"].add(new_zombie)
-            self.scene["ENEMIES"].add(new_zombie)
-            self.scene["COLLIDABLE"].add(new_zombie)
-
-        for pos in self.data["gunners"]:
-            new_gunner = Gunner(pos, 0.0, raycaster=self.raycaster)
-            new_gunner.set_target(self.player)
-            self.scene["TO_DRAW"].add(new_gunner)
-            self.scene["ENEMIES"].add(new_gunner)
-            self.scene["COLLIDABLE"].add(new_gunner)
-            self.scene["WITH_GUN"].add(new_gunner)
-
-        for pos in self.data["gunners"]:
-            new_self_destructor = SelfDestructor(pos, 0.0, raycaster=self.raycaster)
-            new_self_destructor.set_target(self.player)
-            self.scene["TO_DRAW"].add(new_self_destructor)
-            self.scene["ENEMIES"].add(new_self_destructor)
-            self.scene["COLLIDABLE"].add(new_self_destructor)
-        '''
+        
 
 
     def destroy_scene(self):
@@ -202,6 +181,26 @@ class Level:
         self.scene["COLLIDABLE"].add(projectile)
 
 
+    def spawn_enemy(self, game_state):
+        if not (self.scene and self.player):
+            return False
+
+        enemy_type = choice(enemy_types)
+
+        random_spawnpoint = choice(list(self.scene["SPAWNPOINTS"]))
+
+        new_enemy = enemy_type(random_spawnpoint.transform.position, randrange(-180, 180), raycaster=self.raycaster)
+        new_enemy.set_target(self.player)
+        self.scene["TO_DRAW"].add(new_enemy)
+        self.scene["ENEMIES"].add(new_enemy)
+        self.scene["COLLIDABLE"].add(new_enemy)
+
+        if (enemy_type is Gunner):
+            self.scene["WITH_GUN"].add(new_enemy)
+
+        game_state.current_enemies += 1
+
+
     def generate_level(self, stage=0):
         data = {
             "player": [300.0, 760.0],
@@ -233,3 +232,5 @@ class Level:
                     data["spawnpoints"].append(new_pos)
 
         return data
+
+

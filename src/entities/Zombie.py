@@ -1,3 +1,5 @@
+import pygame
+
 from ..components.Components import HealthComponent, TransformComponent, RigidComponent
 from ..render.renderer import Renderer
 
@@ -16,9 +18,12 @@ class Zombie():
         self.health = HealthComponent(self.on_death, max_health)
         
         self.transform = TransformComponent(position, rotation)
-        self.rigidBody = RigidComponent(self.transform, speed)
+        self.rigidBody = RigidComponent(self.transform, speed, on_touch=self.on_touch)
 
-        self.min_target_range = 200
+        self.hit_cooldown = 1.0
+        self.can_hit = 0
+        self.damage = 10
+
         self.target = False
 
         self.size = (self.scale[0] * Renderer.image_cords[self._type][2], self.scale[1] * Renderer.image_cords[self._type][3])
@@ -32,7 +37,7 @@ class Zombie():
 
 
     def _update(self, dt):
-        if self.is_target_in_range() and self.can_see_target():
+        if self.can_see_target():
             self.rigidBody.rotate_towards_point(self.target.transform.position)
             self.rigidBody.move_towards_point(self.target.transform.position)
 
@@ -41,13 +46,16 @@ class Zombie():
         else:
             self.rigidBody.stand_still()
 
+        if self.can_hit > 0:
+            self.can_hit -= dt
+
 
     def is_target_in_range(self):
         if self.target:
             dist_x = self.target.transform.position[0] - self.transform.position[0]
             dist_y = self.target.transform.position[1] - self.transform.position[1]
 
-            return sqrt(dist_x ** 2 + dist_y ** 2) <= self.min_target_range
+            return sqrt(dist_x ** 2 + dist_y ** 2) <= self.hit_range
         
         return False
 
@@ -69,5 +77,15 @@ class Zombie():
 
 
     def on_death(self):
-        print("dead")
+        pygame.event.post(pygame.event.Event(pygame.USEREVENT, {"user_type": "ENEMY_DIED"}))
         self.destroyed = True
+
+
+    def on_touch(self, other):
+        if other.transform is self.transform:
+            return
+
+        if other._type == "Player" and self.can_hit <= 0:
+            if hasattr(other, "health"):
+                self.can_hit = self.hit_cooldown
+                other.health.take_damage(self.damage)

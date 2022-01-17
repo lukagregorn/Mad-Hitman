@@ -39,7 +39,6 @@ class Gui:
 
                 if event.ui_element is self.ui["pause"]:
                     self.game_state.menu = True
-                    self.game_state.load_new_level = True
                     self.ui["play"].visible = True
                     self.ui["pause"].visible = False
                     self.ui["palyer_health"].visible = False

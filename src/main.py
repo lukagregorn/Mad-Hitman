@@ -1,5 +1,6 @@
 # system
-import sys, os, pygame
+from random import randrange
+import sys, pygame
 from pygame.locals import *
 
 # services
@@ -18,7 +19,11 @@ class GameState:
         self.paused = False
         self.menu = True
         self.restart = False
-        self.load_new_level = False
+
+        self.stage = 0
+        self.current_enemies = 0
+        self.enemies_left = 0
+        self.max_enemies = 0
 
 
 class MadGunner:
@@ -41,11 +46,9 @@ class MadGunner:
 
         while True:
             self._check_events()
+            self._update_game_state()
             
-            if self.game_state.load_new_level:
-                self.game_state.load_new_level = False
-                self.level.load_scene()
-
+            
             if not self.game_state.menu and not self.game_state.paused:
                 self._update(Settings.dt)
 
@@ -55,7 +58,7 @@ class MadGunner:
 
     def _setup_level(self):
         self.level = Level()
-        self.level.load_scene()
+        self.level.load_scene(self.game_state)
 
 
     def _check_events(self):
@@ -65,6 +68,23 @@ class MadGunner:
             
             self.gui.process_event(event)
 
+            if event.type == pygame.USEREVENT:
+                if event.user_type == "ENEMY_DIED":
+                    self.game_state.current_enemies -= 1
+                    self.game_state.enemies_left -= 1
+
+
+    def _update_game_state(self):
+        if self.game_state.enemies_left <= 0:
+            self.level.load_scene(self.game_state)
+
+        enemies_to_spawn = self.game_state.max_enemies - self.game_state.current_enemies
+        while enemies_to_spawn > 0:
+            if self.game_state.enemies_left > self.game_state.current_enemies:
+                self.level.spawn_enemy(self.game_state)
+
+            enemies_to_spawn -= 1
+            
 
     def _update(self, dt):
         # update objects

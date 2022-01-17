@@ -1,4 +1,3 @@
-from typing import Sized
 import pygame
 import pygame.mouse as mouse
 

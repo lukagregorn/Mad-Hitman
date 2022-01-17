@@ -1,3 +1,5 @@
+import pygame
+
 from ..components.Components import HealthComponent, TransformComponent, RigidComponent, GunComponent
 from ..render.renderer import Renderer
 
@@ -34,7 +36,7 @@ class Gunner():
 
 
     def _update(self, dt):
-        if self.is_target_in_range() and self.can_see_target():
+        if self.can_see_target():
             self.rigidBody.rotate_towards_point(self.target.transform.position)
             self.rigidBody.move_towards_point(self.target.transform.position)
 
@@ -72,5 +74,5 @@ class Gunner():
 
 
     def on_death(self):
-        print("dead")
+        pygame.event.post(pygame.event.Event(pygame.USEREVENT, {"user_type": "ENEMY_DIED"}))
         self.destroyed = True
