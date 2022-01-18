@@ -75,8 +75,14 @@ class MadGunner:
 
 
     def _update_game_state(self):
-        if self.game_state.enemies_left <= 0:
+
+        if self.game_state.restart and not self.game_state.menu:
             self.level.load_scene(self.game_state)
+            self.game_state.restart = False
+
+        elif self.game_state.enemies_left <= 0:
+            self.level.load_scene(self.game_state)
+
 
         enemies_to_spawn = self.game_state.max_enemies - self.game_state.current_enemies
         while enemies_to_spawn > 0:

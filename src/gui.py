@@ -23,10 +23,16 @@ class Gui:
                                             manager=self.manager)
         self.ui["pause"].visible = False
 
-        self.ui["palyer_health"] = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((4, 4), (64, 32)),
+        self.ui["palyer_health"] = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((4, 800-32-4), (64, 32)),
                                             text='HP: 000',
                                             manager=self.manager)
         self.ui["palyer_health"].visible = False
+
+
+        self.ui["stage"] = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((600-4-64, 800-32-4), (64, 32)),
+                                            text='STAGE: 0',
+                                            manager=self.manager)
+        self.ui["stage"].visible = False
 
     def process_event(self, event):
         if event.type == pygame.USEREVENT:
@@ -36,21 +42,31 @@ class Gui:
                     self.ui["play"].visible = False
                     self.ui["pause"].visible = True
                     self.ui["palyer_health"].visible = True
+                    self.ui["stage"].visible = True
 
                 if event.ui_element is self.ui["pause"]:
                     self.game_state.menu = True
                     self.ui["play"].visible = True
                     self.ui["pause"].visible = False
                     self.ui["palyer_health"].visible = False
+                    self.ui["stage"].visible = False
 
             if event.user_type == "PLAYER_DIED":
                 self.game_state.menu = True     # TODO: reset here
+                self.game_state.restart = True
+
+                self.ui["play"].set_text("RESTART")
                 self.ui["play"].visible = True
+
                 self.ui["pause"].visible = False
                 self.ui["palyer_health"].visible = False
+                self.ui["stage"].visible = False
 
             if event.user_type == "HEALTH_CHANGED":
                 self.ui["palyer_health"].set_text(f"HP: {event.player_health}")
+
+            if event.user_type == "STAGE_CHANGED":
+                self.ui["stage"].set_text(f"STAGE: {event.stage}")
 
         self.manager.process_events(event)
 

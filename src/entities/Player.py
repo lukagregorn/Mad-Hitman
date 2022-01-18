@@ -80,3 +80,8 @@ class Player():
         self.last_rot_vec = [0,0]
         self.transform.position = position
         self.transform.rotation = rotation
+
+    def respawn(self):
+        self.health.health = self.health.max_health
+        self.health.on_health_changed(self.health.health)
+        self.destroyed = False

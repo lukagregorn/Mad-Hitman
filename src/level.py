@@ -1,3 +1,5 @@
+import pygame
+
 # instances
 from turtle import pos
 from .entities.Player import Player
@@ -99,10 +101,16 @@ class Level:
 
     def load_scene(self, game_state):
         self.destroy_scene()
+
+        if game_state.restart:
+            game_state.stage = 0
+
         game_state.stage += 1
         game_state.current_enemies = 0
         game_state.enemies_left = 5 + int(game_state.stage * 1.35)
         game_state.max_enemies = 2 + int(1.1 ** game_state.stage)
+
+        pygame.event.post(pygame.event.Event(pygame.USEREVENT, {"user_type": "STAGE_CHANGED", "stage": game_state.stage}))
 
         self.data = self.generate_level()
 
@@ -116,7 +124,7 @@ class Level:
             "SPAWNPOINTS": set(),
         }
 
-        self.load_player(self.data["player"])
+        self.load_player(self.data["player"], restart=game_state.restart)
 
         # make map
         for tile_type, positions in self.data["map_tiles"].items():
@@ -150,12 +158,17 @@ class Level:
         self.scene = None
 
 
-    def load_player(self, position=[280.0, 750.0], rotation=90):
+    def load_player(self, position=[280.0, 750.0], rotation=90, restart=False):
         if not self.scene:
             return False
 
         if self.player:
+
+            if restart:
+                self.player.respawn()
+
             self.player.reset_position(position, rotation)
+                
 
             if not self.player in self.scene["TO_DRAW"]:
                 self.scene["TO_DRAW"].add(self.player)
