@@ -14,8 +14,8 @@ class Zombie():
     collider_scale = 0.925
     scale = (1.1, 1.1)
 
-    def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=100, speed=50, raycaster=None):
-        self.health = HealthComponent(self.on_death, max_health)
+    def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=40, speed=45, raycaster=None, stage=1):
+        self.health = HealthComponent(self.on_death, max_health+stage*4)
         
         self.transform = TransformComponent(position, rotation)
         self.rigidBody = RigidComponent(self.transform, speed, on_touch=self.on_touch)

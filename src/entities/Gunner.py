@@ -14,13 +14,13 @@ class Gunner():
     collider_scale = 0.925
     scale = (1.1, 1.1)
 
-    def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=100, speed=30, raycaster=None):
+    def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=25, speed=30, raycaster=None, stage=1):
         self.health = HealthComponent(self.on_death, max_health)
         
         self.transform = TransformComponent(position, rotation)
         self.rigidBody = RigidComponent(self.transform, speed)
 
-        self.gun = GunComponent(["Player"], self.transform, fire_rate=1.5, semi_auto=False, projectile_type="RED")
+        self.gun = GunComponent(["Player"], self.transform, fire_rate=0.45 + 2.5*(1/stage), semi_auto=False, projectile_type="RED")
 
         self.min_target_range = 500
         self.target = False

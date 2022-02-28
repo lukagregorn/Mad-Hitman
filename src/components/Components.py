@@ -29,6 +29,15 @@ class HealthComponent:
         self.on_death = on_death
         self.on_health_changed = on_health_changed
 
+    
+    def heal_up(self, heal_for):
+        self.health += heal_for
+        if (self.health > self.max_health):
+            self.health = self.max_health
+
+        if self.on_health_changed:
+            self.on_health_changed(self.health)
+
 
     def take_damage(self, damage):
         self.health -= damage

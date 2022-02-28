@@ -1,7 +1,6 @@
 import pygame
 
 # instances
-from turtle import pos
 from .entities.Player import Player
 from .entities.Zombie import Zombie
 from .entities.Gunner import Gunner
@@ -9,6 +8,7 @@ from .entities.SelfDestructor import SelfDestructor
 from .entities.Tile import Tile
 from .entities.Spawnpoint import Spawnpoint
 
+from .states import ScreenState
 from .physics.raycaster import Raycaster
 from .render.renderer import Renderer
 
@@ -102,7 +102,7 @@ class Level:
     def load_scene(self, game_state):
         self.destroy_scene()
 
-        if game_state.restart:
+        if game_state.screen_state == ScreenState.PLAYER_DIED:
             game_state.stage = 0
 
         game_state.stage += 1
@@ -124,7 +124,7 @@ class Level:
             "SPAWNPOINTS": set(),
         }
 
-        self.load_player(self.data["player"], restart=game_state.restart)
+        self.load_player(self.data["player"], restart=game_state.screen_state == ScreenState.PLAYER_DIED)
 
         # make map
         for tile_type, positions in self.data["map_tiles"].items():
@@ -202,7 +202,7 @@ class Level:
 
         random_spawnpoint = choice(list(self.scene["SPAWNPOINTS"]))
 
-        new_enemy = enemy_type(random_spawnpoint.transform.position, randrange(-180, 180), raycaster=self.raycaster)
+        new_enemy = enemy_type(random_spawnpoint.transform.position, randrange(-180, 180), raycaster=self.raycaster, stage=game_state.stage)
         new_enemy.set_target(self.player)
         self.scene["TO_DRAW"].add(new_enemy)
         self.scene["ENEMIES"].add(new_enemy)

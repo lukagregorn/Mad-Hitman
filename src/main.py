@@ -1,10 +1,12 @@
 # system
-from random import randrange
+from random import sample
 import sys, pygame
+from numpy import power
 from pygame.locals import *
 
 # services
 from .settings import Settings
+from .states import ScreenState
 from .gui import Gui
 from .level import Level
 from .render.renderer import Renderer
@@ -13,17 +15,23 @@ from .physics.collision_detection import collision_detection
 # instancces
 from .entities.Projectile import Projectile
 
+POWERUPS = [
+    ["SPEED", 1.20],
+    ["HEALTH", 1.10],
+    ["RECOIL", 0.50],
+    ["FIRE RATE", 0.65],
+]
+
 
 class GameState:
     def __init__(self):
-        self.paused = False
-        self.menu = True
-        self.restart = False
+        self.screen_state = ScreenState.MAIN_MENU
 
         self.stage = 0
         self.current_enemies = 0
         self.enemies_left = 0
         self.max_enemies = 0
+        self.powerup_indexes = [0, 1]
 
 
 class MadGunner:
@@ -49,7 +57,7 @@ class MadGunner:
             self._update_game_state()
             
             
-            if not self.game_state.menu and not self.game_state.paused:
+            if self.game_state.screen_state == ScreenState.PLAYING:
                 self._update(Settings.dt)
 
             self._render()
@@ -76,12 +84,24 @@ class MadGunner:
 
     def _update_game_state(self):
 
-        if self.game_state.restart and not self.game_state.menu:
+        if self.game_state.screen_state == ScreenState.PLAYER_DIED:
             self.level.load_scene(self.game_state)
-            self.game_state.restart = False
+            self.game_state.screen_state = ScreenState.MAIN_MENU
 
         elif self.game_state.enemies_left <= 0:
             self.level.load_scene(self.game_state)
+            self.powerup_indexes = sample(range(len(POWERUPS)), 2)
+            self.gui.show_powerup(True, POWERUPS[self.powerup_indexes[0]], POWERUPS[self.powerup_indexes[1]])
+
+        elif self.game_state.screen_state == ScreenState.POWERUP1:
+            self.level.player.apply_powerup(POWERUPS[self.powerup_indexes[0]])
+            self.level.player.health.heal_up(self.level.player.health.max_health)
+            self.gui.show_gameplay()
+
+        elif self.game_state.screen_state == ScreenState.POWERUP2:
+            self.level.player.apply_powerup(POWERUPS[self.powerup_indexes[0]])
+            self.level.player.health.heal_up(self.level.player.health.max_health)
+            self.gui.show_gameplay()
 
 
         enemies_to_spawn = self.game_state.max_enemies - self.game_state.current_enemies

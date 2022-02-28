@@ -1,3 +1,4 @@
+from matplotlib.colors import PowerNorm
 import pygame
 import pygame.mouse as mouse
 
@@ -14,14 +15,14 @@ class Player():
     collider_scale = 0.925
     scale = (1.1, 1.1)
 
-    def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=100, speed=120, raycaster=None):
+    def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=50, speed=120, raycaster=None):
 
         self.health = HealthComponent(self.on_death, max_health, self.on_health_changed)
         
         self.transform = TransformComponent(position, rotation)
         self.rigidBody = RigidComponent(self.transform, speed, clamp_to_screen=True)
         
-        self.gun = GunComponent(["Gunner", "Zombie", "SelfDestructor"], self.transform, fire_rate=0.25, semi_auto=False, projectile_type="YELLOW", recoil=15)
+        self.gun = GunComponent(["Gunner", "Zombie", "SelfDestructor"], self.transform, fire_rate=0.75, semi_auto=False, projectile_type="YELLOW", recoil=45)
 
         self.last_rot_vec = [0.0, 0.0]
 
@@ -66,6 +67,26 @@ class Player():
         #else:
         #    self.gun.release_trigger()
 
+    def apply_powerup(self, powerup):
+        powerup_key = powerup[0]
+        powerup_value = powerup[1]
+
+        if powerup_key == "SPEED":
+            self.rigidBody.speed *= powerup_value
+
+        if powerup_key == "RECOIL":
+            self.gun.recoil *= powerup_value
+        
+        if powerup_key == "HEALTH":
+            self.health.max_health *= powerup_value
+
+        if powerup_key == "FIRE RATE":
+            self.gun.fire_rate *= powerup_value
+
+        if powerup_key == "DAMAGE":
+            print("damage")
+
+
     def on_death(self):
         self.destroyed = True
         pygame.event.post(pygame.event.Event(pygame.USEREVENT, {"user_type": "PLAYER_DIED"}))
@@ -82,6 +103,12 @@ class Player():
         self.transform.rotation = rotation
 
     def respawn(self):
+        self.rigidBody.speed = 120
+        self.health.max_health = 50
+        self.gun.fire_rate = 0.75
+        self.gun.recoil = 45
+
+
         self.health.health = self.health.max_health
         self.health.on_health_changed(self.health.health)
         self.destroyed = False

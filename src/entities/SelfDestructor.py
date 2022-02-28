@@ -15,11 +15,11 @@ class SelfDestructor():
     collider_scale = 0.925
     scale = (0.8, 0.8)
 
-    def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=30, speed=140, damage=15, raycaster=None):
+    def __init__(self, position=[0.0,0.0], rotation=0.0, max_health=10, speed=130, damage=15, raycaster=None, stage=1):
         self.health = HealthComponent(self.on_death, max_health)
         
         self.transform = TransformComponent(position, rotation)
-        self.rigidBody = RigidComponent(self.transform, speed, on_touch=self.on_touch)
+        self.rigidBody = RigidComponent(self.transform, speed+stage*5, on_touch=self.on_touch)
 
         self.min_target_range = 300
         self.damage = damage
