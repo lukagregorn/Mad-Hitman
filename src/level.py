@@ -5,6 +5,7 @@ from .entities.Player import Player
 from .entities.Zombie import Zombie
 from .entities.Gunner import Gunner
 from .entities.SelfDestructor import SelfDestructor
+from .entities.Boss import Boss
 from .entities.Tile import Tile
 from .entities.Spawnpoint import Spawnpoint
 
@@ -12,7 +13,7 @@ from .states import ScreenState
 from .physics.raycaster import Raycaster
 from .render.renderer import Renderer
 
-from random import choice, randrange, sample
+from random import choice, randrange, sample, random
 
 
 # level generation data
@@ -23,6 +24,23 @@ background_types = [
     "BackgroundGreen",
     "BackgroundRed",
     "BackgroundBlue",
+]
+
+decoration_tile_size = 40 #common divisor width/height
+decoration_tile_chance = 0.035
+decoration = [
+    #"Leaves",
+    #"Fikus",
+    "Rock1",
+    "Rock2",
+    "Rock3",
+    "Stick",
+    "TwoBoxes",
+    "Debris1",
+    "Debris2",
+    "Debris3",
+    "Bricks1",
+    "Bricks2",
 ]
 
 # SCREEN is split into 7 chunks
@@ -97,6 +115,7 @@ class Level:
         self.player = None
         self.data = None
         self.scene = None
+        self.is_boss_level = False
 
 
     def load_scene(self, game_state):
@@ -107,12 +126,18 @@ class Level:
 
         game_state.stage += 1
         game_state.current_enemies = 0
-        game_state.enemies_left = 5 + int(game_state.stage * 1.35)
+        #game_state.enemies_left = 5 + int(game_state.stage * 1.35)
+        game_state.enemies_left = 1
         game_state.max_enemies = 2 + int(1.1 ** game_state.stage)
 
         pygame.event.post(pygame.event.Event(pygame.USEREVENT, {"user_type": "STAGE_CHANGED", "stage": game_state.stage}))
 
-        self.data = self.generate_level()
+        self.is_boss_level = game_state.stage % 2 == 0
+        if self.is_boss_level:
+            self.data = self.generate_boss_fight()
+            game_state.enemies_left = 1
+        else:
+            self.data = self.generate_level()
 
         self.scene = {
             "BACKGROUND": set(),
@@ -122,9 +147,15 @@ class Level:
             "COLLIDABLE": set(),
             "WITH_GUN": set(),
             "SPAWNPOINTS": set(),
+            "DECORATION": set(),
         }
 
         self.load_player(self.data["player"], restart=game_state.screen_state == ScreenState.PLAYER_DIED)
+
+        # make decoration
+        for decor_data in self.data["decoration"]:
+            new_decor = Tile([decor_data[1], decor_data[2]], decor_data[3], _type=decor_data[0], can_collide=False)
+            self.scene["DECORATION"].add(new_decor)
 
         # make map
         for tile_type, positions in self.data["map_tiles"].items():
@@ -144,7 +175,6 @@ class Level:
 
         self.scene["BACKGROUND"].add(self.data["background"])
         
-
 
     def destroy_scene(self):
         if not self.scene:
@@ -198,6 +228,9 @@ class Level:
         if not (self.scene and self.player):
             return False
 
+        if self.is_boss_level:
+            return self.spawn_boss(game_state)
+
         enemy_type = choice(enemy_types)
 
         random_spawnpoint = choice(list(self.scene["SPAWNPOINTS"]))
@@ -214,12 +247,25 @@ class Level:
         game_state.current_enemies += 1
 
 
+    def spawn_boss(self, game_state):
+        new_boss = Boss([300.0, 100.0], 90, stage=game_state.stage)
+        new_boss.set_target(self.player)
+        self.scene["TO_DRAW"].add(new_boss)
+        self.scene["ENEMIES"].add(new_boss)
+        self.scene["COLLIDABLE"].add(new_boss)
+        self.scene["WITH_GUN"].add(new_boss)
+
+        game_state.current_enemies = 1
+        
+
+
     def generate_level(self, stage=0):
         data = {
             "player": [300.0, 760.0],
             "map_tiles": dict(),
             "spawnpoints": [],
             "background": choice(background_types),
+            "decoration": self.spread_decoration(),
         }
 
         chunk_spawnpoint_indexes = sample(range(len(chunk_positions)), 3)
@@ -245,5 +291,30 @@ class Level:
                     data["spawnpoints"].append(new_pos)
 
         return data
+
+
+    def generate_boss_fight(self):
+        data = {
+            "player": [300.0, 760.0],
+            "map_tiles": dict(),
+            "spawnpoints": [],
+            "background": choice(background_types),
+            "decoration": self.spread_decoration(),
+        }
+
+        return  data
+
+
+    def spread_decoration(self):
+        data = []
+        for x in range(0, 600-decoration_tile_size, decoration_tile_size):
+            for y in range(0, 800-decoration_tile_size, decoration_tile_size):
+                if random() > decoration_tile_chance:
+                    continue
+
+                data.append((choice(decoration), x+decoration_tile_size/2, y+decoration_tile_size/2, randrange(-180, 180)))
+
+        return data
+
 
 

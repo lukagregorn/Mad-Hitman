@@ -46,6 +46,7 @@ class HealthComponent:
             self.on_health_changed(self.health)
 
         sound = pygame.mixer.Sound(os.path.join("assets", "hit.wav"))
+        sound.set_volume(Settings.sound_volume/100)
         pygame.mixer.Sound.play(sound)
 
         if self.health <= 0 and self.on_death:
@@ -109,7 +110,7 @@ class RigidComponent:
             self.transform.position[1] = min(max(0, self.transform.position[1]), Settings.screen_height)
 
 class GunComponent:
-    def __init__(self, only_hit_types, transform, fire_rate=0.5, semi_auto=True, projectile_type="YELLOW", recoil=50):
+    def __init__(self, only_hit_types, transform, fire_rate=0.5, semi_auto=True, projectile_type="YELLOW", recoil=50, speed_multi=1.0, damage_multi=1.0):
 
         if not transform:
             return None
@@ -127,6 +128,8 @@ class GunComponent:
         self.can_shoot = 0
         self.fire_rate = fire_rate
         self.recoil = recoil
+        self.speed_multi = speed_multi
+        self.damage_multi = damage_multi
 
         # projectiles to generate
         self._projectiles_to_spawn = []
@@ -164,34 +167,8 @@ class GunComponent:
             "parent_transform": self.transform,
             "only_hit_types": self.only_hit_types,
             "projectile_type": self.projectile_type,
+            "speed_multi": self.speed_multi,
+            "damage_multi": self.damage_multi,
         }
 
         self._projectiles_to_spawn.append(data)
-
-
-
-            
-
-        
-
-
-
-
-"""
-class TextComponent:
-    def __init__(self, text, size, color):
-        self.text = text
-        self.size = size
-        self.color = pygame.color.Color(color)
-        self.font = pygame.font.Font(None, self.size)
-
-        
-class AudioComponent:
-    def __init__(self, sound: pygame.mixer.Sound) -> None:
-        self.sound = sound
-
-
-class LifeTimeComponent:
-    def __init__(self, life_time: int) -> None:
-        self.life_time = life_time
-"""

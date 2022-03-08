@@ -17,12 +17,12 @@ class Tile():
     collider_scale = 1.0
     scale = (1.0, 1.0)
 
-    def __init__(self, position=[0.0,0.0], rotation=0.0, _type="Box"):
+    def __init__(self, position=[0.0,0.0], rotation=0.0, can_collide=True, _type="Box"):
         
         self._type = _type
 
         self.transform = TransformComponent(position, rotation)
-        self.rigidBody = RigidComponent(self.transform, static=True, on_touch=self.on_touch)
+        self.rigidBody = RigidComponent(self.transform, static=True, on_touch=self.on_touch, canCollide=can_collide)
 
         self.size = (self.scale[0] * Renderer.image_cords[self._type][2], self.scale[1] * Renderer.image_cords[self._type][3])
 

@@ -12,3 +12,7 @@ class Settings:
     # gameplay
     fps = 60
     dt = 1/fps
+
+    # volume
+    music_volume = 100
+    sound_volume = 100

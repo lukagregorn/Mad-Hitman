@@ -22,7 +22,7 @@ class Player():
         self.transform = TransformComponent(position, rotation)
         self.rigidBody = RigidComponent(self.transform, speed, clamp_to_screen=True)
         
-        self.gun = GunComponent(["Gunner", "Zombie", "SelfDestructor"], self.transform, fire_rate=0.75, semi_auto=False, projectile_type="YELLOW", recoil=45)
+        self.gun = GunComponent(["Gunner", "Zombie", "SelfDestructor", "Boss"], self.transform, fire_rate=0.75, semi_auto=False, projectile_type="YELLOW", recoil=45)
 
         self.last_rot_vec = [0.0, 0.0]
 
@@ -84,7 +84,10 @@ class Player():
             self.gun.fire_rate *= powerup_value
 
         if powerup_key == "DAMAGE":
-            print("damage")
+            self.gun.damage_multi *= powerup_value
+        
+        if powerup_key == "BULLET SPEED":
+            self.gun.speed_multi *= powerup_value
 
 
     def on_death(self):
@@ -107,7 +110,8 @@ class Player():
         self.health.max_health = 50
         self.gun.fire_rate = 0.75
         self.gun.recoil = 45
-
+        self.gun.damage_multi = 1
+        self.gun.speed_multi = 1
 
         self.health.health = self.health.max_health
         self.health.on_health_changed(self.health.health)

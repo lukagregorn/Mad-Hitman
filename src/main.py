@@ -1,6 +1,6 @@
 # system
 from random import sample
-import sys, pygame
+import sys, pygame, os
 from numpy import power
 from pygame.locals import *
 
@@ -20,6 +20,8 @@ POWERUPS = [
     ["HEALTH", 1.10],
     ["RECOIL", 0.50],
     ["FIRE RATE", 0.65],
+    ["DAMAGE", 1.05],
+    ["BULLET SPEED", 1.15],
 ]
 
 
@@ -39,6 +41,10 @@ class MadGunner:
     def __init__(self):
         
         pygame.init()
+
+        pygame.mixer.music.load(os.path.join("assets", "music.mp3"))
+        pygame.mixer.music.play(loops=-1)
+
         self.game_state = GameState()
         
         self.screen = pygame.display.set_mode((Settings.screen_width, Settings.screen_height))
@@ -151,7 +157,7 @@ class MadGunner:
             if (len(projectiles) > 0):
                 for projectile in projectiles:
 
-                    new_projecitle = Projectile(projectile["position"], projectile["target"], only_hit_types=projectile["only_hit_types"], parent_transform=projectile["parent_transform"], projectile_type=projectile["projectile_type"])
+                    new_projecitle = Projectile(projectile["position"], projectile["target"], only_hit_types=projectile["only_hit_types"], parent_transform=projectile["parent_transform"], projectile_type=projectile["projectile_type"], speed_multi=projectile["speed_multi"], damage_multi=projectile["damage_multi"])
                     self.level.add_projectile(new_projecitle)
 
             object.gun._projectiles_to_spawn = []

@@ -16,7 +16,7 @@ class Gui:
 
 
     def make_ui(self):
-        self.ui["play"] = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((40, 400), (600-80, 100)),
+        self.ui["play"] = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((40, 400), (Settings.screen_width-80, 100)),
                                             text='PLAY',
                                             manager=self.manager)
 
@@ -27,19 +27,19 @@ class Gui:
         self.ui["pause"].visible = False
 
 
-        self.ui["palyer_health"] = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((4, 800-32-4), (64, 32)),
+        self.ui["palyer_health"] = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((4, Settings.screen_height-32-4), (64, 32)),
                                             text='HP: 000',
                                             manager=self.manager)
         self.ui["palyer_health"].visible = False
 
 
-        self.ui["stage"] = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((600-4-64, 800-32-4), (64, 32)),
+        self.ui["stage"] = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((Settings.screen_width-4-96, Settings.screen_height-32-4), (96, 32)),
                                             text='STAGE: 0',
                                             manager=self.manager)
         self.ui["stage"].visible = False
 
 
-        self.ui["main_label"] = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((40, 350), (600-80, 50)),
+        self.ui["main_label"] = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((40, 350), (Settings.screen_width-80, 50)),
                                             text='LABEL',
                                             manager=self.manager)
         self.ui["main_label"].visible = False
@@ -55,6 +55,40 @@ class Gui:
                                             text='POW2',
                                             manager=self.manager)
         self.ui["pow2"].visible = False
+
+
+        self.ui["sound"] = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((Settings.screen_width-92-64-16, 4), (92, 32)),
+                                            text=f'Sound: {Settings.sound_volume}',
+                                            manager=self.manager)
+        self.ui["sound"].visible = False
+
+        self.ui["sound_up"] = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((Settings.screen_width-64-8, 4), (32, 32)),
+                                            text='+',
+                                            manager=self.manager)
+        self.ui["sound_up"].visible = False
+
+        self.ui["sound_down"] = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((Settings.screen_width-32-4, 4), (32, 32)),
+                                            text='-',
+                                            manager=self.manager)
+
+        self.ui["sound_down"].visible = False
+
+        self.ui["music"] = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((Settings.screen_width-92-64-16, 4+32+4), (92, 32)),
+                                            text=f'Music: {Settings.music_volume}',
+                                            manager=self.manager)
+        self.ui["music"].visible = False
+
+        self.ui["music_up"] = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((Settings.screen_width-64-8, 4+32+4), (32, 32)),
+                                            text='+',
+                                            manager=self.manager)
+        self.ui["music_up"].visible = False
+
+        self.ui["music_down"] = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((Settings.screen_width-32-4, 4+32+4), (32, 32)),
+                                            text='-',
+                                            manager=self.manager)
+
+        self.ui["music_down"].visible = False
+
 
     def process_event(self, event):
         if event.type == pygame.USEREVENT:
@@ -72,6 +106,29 @@ class Gui:
 
                 if event.ui_element is self.ui["pause"]:
                     self.show_paused()
+
+
+                is_volume = False
+                if event.ui_element is self.ui["sound_up"]:
+                    Settings.sound_volume = max(min(Settings.sound_volume+1, 100), 0)
+                    is_volume = True
+
+                if event.ui_element is self.ui["sound_down"]:
+                    Settings.sound_volume = max(min(Settings.sound_volume-1, 100), 0)
+                    is_volume = True
+
+                if event.ui_element is self.ui["music_up"]:
+                    Settings.music_volume = max(min(Settings.music_volume+1, 100), 0)
+                    pygame.mixer.music.set_volume(Settings.music_volume/100)
+                    is_volume = True
+
+                if event.ui_element is self.ui["music_down"]:
+                    Settings.music_volume = max(min(Settings.music_volume-1, 100), 0)
+                    pygame.mixer.music.set_volume(Settings.music_volume/100)
+                    is_volume = True
+
+                if is_volume:
+                    self.show_volume(True)
 
 
                 if event.ui_element is self.ui["pow1"]:
@@ -115,6 +172,7 @@ class Gui:
         self.ui["main_label"].visible = False
         self.set_gameplay_overlay_visible(True)
         self.game_state.screen_state = ScreenState.PLAYING
+        self.show_volume(False)
 
 
     def show_paused(self):
@@ -122,6 +180,19 @@ class Gui:
         self.ui["play"].visible = True
         self.set_gameplay_overlay_visible(False)
         self.game_state.screen_state = ScreenState.PAUSED
+        self.show_volume(True)
+
+
+    def show_volume(self, visible):
+        self.ui["sound"].visible = visible
+        self.ui["sound_up"].visible = visible
+        self.ui["sound_down"].visible = visible
+        self.ui["sound"].set_text(f"Sound: {Settings.sound_volume}")
+
+        self.ui["music"].visible = visible
+        self.ui["music_up"].visible = visible
+        self.ui["music_down"].visible = visible
+        self.ui["music"].set_text(f"Music: {Settings.music_volume}")
 
 
     def show_game_over(self):

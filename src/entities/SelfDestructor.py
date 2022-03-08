@@ -3,6 +3,7 @@ import pygame
 
 from ..components.Components import HealthComponent, TransformComponent, RigidComponent
 from ..render.renderer import Renderer
+from ..settings import Settings
 
 from math import sqrt
 
@@ -85,6 +86,7 @@ class SelfDestructor():
             self.on_death()
 
             sound = pygame.mixer.Sound(os.path.join("assets", "explosion.wav"))
+            sound.set_volume(Settings.sound_volume/100)
             pygame.mixer.Sound.play(sound)
 
             if hasattr(other, "health"):

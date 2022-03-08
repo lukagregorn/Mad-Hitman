@@ -22,6 +22,22 @@ PROJECTILE_TYPES = {
         "_type": "ProjectileRed",
         "sound": "shoot2.wav",
     },
+
+    "BOSS": {
+        "speed": 400,
+        "damage": 5,
+        "scale": (1.4, 1.4),
+        "_type": "ProjectileBoss",
+        "sound": "shoot2.wav",
+    },
+
+    "BOSS_BIG": {
+        "speed": 400,
+        "damage": 5,
+        "scale": (2.3, 2.3),
+        "_type": "ProjectileBoss",
+        "sound": "shoot2.wav",
+    },
 }
 
 # projecitle class
@@ -32,14 +48,14 @@ class Projectile():
 
     collider_scale = 1.0
 
-    def __init__(self, position=[0.0,0.0], target=[0.0,0.0], only_hit_types=[], parent_transform=None, projectile_type="YELLOW"):
+    def __init__(self, position=[0.0,0.0], target=[0.0,0.0], only_hit_types=[], parent_transform=None, projectile_type="YELLOW", speed_multi=1.0, damage_multi=1.0):
         self.transform = TransformComponent(position)
-        self.rigidBody = RigidComponent(self.transform, PROJECTILE_TYPES[projectile_type]["speed"], on_touch=self.on_touch)
+        self.rigidBody = RigidComponent(self.transform, PROJECTILE_TYPES[projectile_type]["speed"]*speed_multi, on_touch=self.on_touch)
 
         self.rigidBody.rotate_towards_point(target)
         self.rigidBody.move_towards_point(target)
 
-        self.damage = PROJECTILE_TYPES[projectile_type]["damage"]
+        self.damage = PROJECTILE_TYPES[projectile_type]["damage"] * damage_multi
         self.only_hit_types = only_hit_types
 
         self.scale = PROJECTILE_TYPES[projectile_type]["scale"]
@@ -52,6 +68,7 @@ class Projectile():
 
         # play sound
         sound = mixer.Sound(os.path.join("assets", PROJECTILE_TYPES[projectile_type]["sound"]))
+        sound.set_volume(Settings.sound_volume/100)
         mixer.Sound.play(sound)
 
     def _update(self, dt):
