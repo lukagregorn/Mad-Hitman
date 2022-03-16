@@ -3,6 +3,7 @@ from random import sample
 import sys, pygame, os
 from numpy import power
 from pygame.locals import *
+from .serialization import get_data, save_data
 
 # services
 from .settings import Settings
@@ -30,12 +31,14 @@ class GameState:
         self.screen_state = ScreenState.MAIN_MENU
 
         self.stage = 0
+        self.max_stage = 0
         self.current_enemies = 0
         self.enemies_left = 0
         self.max_enemies = 0
         self.powerup_indexes = [0, 1]
 
 
+#todo: saving, scaling
 class MadGunner:
 
     def __init__(self):
@@ -46,6 +49,7 @@ class MadGunner:
         pygame.mixer.music.play(loops=-1)
 
         self.game_state = GameState()
+        self.process_save_data(get_data())
         
         self.screen = pygame.display.set_mode((Settings.screen_width, Settings.screen_height))
         self.gui = Gui(self.screen, self.game_state)
@@ -53,7 +57,14 @@ class MadGunner:
 
         self.renderer = Renderer(self.screen)
 
-        
+    
+    def process_save_data(self, data):
+        Settings.music_volume = data["music_volume"]
+        Settings.sound_volume = data["sound_volume"]
+        self.game_state.max_stage = data["max_stage"]
+        pygame.mixer.music.set_volume(Settings.music_volume/100)
+
+
     def run_game(self):
         self._game_clock = pygame.time.Clock()
         self._setup_level()

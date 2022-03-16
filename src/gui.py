@@ -2,6 +2,7 @@ import pygame_gui, pygame, os
 
 from .settings import Settings
 from .states import ScreenState
+from .serialization import save_data
 
 class Gui:
     
@@ -13,6 +14,16 @@ class Gui:
         self.ui = {}
         self.make_ui()
         self.show_main()
+
+    
+    def save_game_state(self):
+        data = {
+            "music_volume": Settings.music_volume,
+            "sound_volume": Settings.sound_volume,
+            "max_stage": self.game_state.max_stage,
+        }
+
+        save_data(data)
 
 
     def make_ui(self):
@@ -37,6 +48,11 @@ class Gui:
                                             text='STAGE: 0',
                                             manager=self.manager)
         self.ui["stage"].visible = False
+
+        self.ui["max_stage"] = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((Settings.screen_width-4-108-4-96, Settings.screen_height-32-4), (108, 32)),
+                                            text=f'MAX STAGE: {self.game_state.max_stage}',
+                                            manager=self.manager)
+        self.ui["max_stage"].visible = False
 
 
         self.ui["main_label"] = pygame_gui.elements.UILabel(relative_rect=pygame.Rect((40, 350), (Settings.screen_width-80, 50)),
@@ -129,6 +145,7 @@ class Gui:
 
                 if is_volume:
                     self.show_volume(True)
+                    self.save_game_state()
 
 
                 if event.ui_element is self.ui["pow1"]:
@@ -142,12 +159,15 @@ class Gui:
 
             if event.user_type == "PLAYER_DIED":
                 self.show_game_over()
+                self.save_game_state()
 
             if event.user_type == "HEALTH_CHANGED":
                 self.ui["palyer_health"].set_text(f"HP: {event.player_health:.0f}")
 
             if event.user_type == "STAGE_CHANGED":
                 self.ui["stage"].set_text(f"STAGE: {event.stage}")
+                self.ui["max_stage"].set_text(f"MAX STAGE: {self.game_state.max_stage}")
+                self.save_game_state()
 
         self.manager.process_events(event)
 
@@ -163,6 +183,7 @@ class Gui:
         self.ui["main_label"].visible = True
         self.ui["play"].set_text("PLAY")
         self.ui["play"].visible = True
+        self.ui["max_stage"].visible = True
         self.set_gameplay_overlay_visible(False)
         self.game_state.screen_state = with_state
 
@@ -170,6 +191,7 @@ class Gui:
     def show_gameplay(self):
         self.ui["play"].visible = False
         self.ui["main_label"].visible = False
+        self.ui["max_stage"].visible = False
         self.set_gameplay_overlay_visible(True)
         self.game_state.screen_state = ScreenState.PLAYING
         self.show_volume(False)
@@ -178,6 +200,7 @@ class Gui:
     def show_paused(self):
         self.ui["play"].set_text("RESUME")
         self.ui["play"].visible = True
+        self.ui["max_stage"].visible = True
         self.set_gameplay_overlay_visible(False)
         self.game_state.screen_state = ScreenState.PAUSED
         self.show_volume(True)
@@ -198,6 +221,7 @@ class Gui:
     def show_game_over(self):
         self.ui["play"].set_text("RETRY")
         self.ui["play"].visible = True
+        self.ui["max_stage"].visible = True
         self.ui["main_label"].set_text("GAME OVER!")
         self.ui["main_label"].visible = True
         self.game_state.screen_state = ScreenState.GAME_OVER

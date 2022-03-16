@@ -37,8 +37,6 @@ class Renderer:
         "Bricks1": (1342, 749, 46, 46),
         "Bricks2": (1425, 759, 21, 27),
 
-
-
         # backgrounds
         "BackgroundYellow": (0, 0, 600, 800),
         "BackgroundGreen": (600, 800, 600, 800),
@@ -84,7 +82,6 @@ class Renderer:
             "Bricks1" : [self.spritesheet_tiles.image_at(self.image_cords["Bricks1"], -1), 0],
             "Bricks2" : [self.spritesheet_tiles.image_at(self.image_cords["Bricks2"], -1), 0],
             
-
             "BackgroundYellow": [self.backgrounds.image_at(self.image_cords["BackgroundYellow"], None), 0],
             "BackgroundGreen": [self.backgrounds.image_at(self.image_cords["BackgroundGreen"], None), 0],
             "BackgroundRed": [self.backgrounds.image_at(self.image_cords["BackgroundRed"], None), 0],

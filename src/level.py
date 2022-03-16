@@ -126,9 +126,11 @@ class Level:
 
         game_state.stage += 1
         game_state.current_enemies = 0
-        #game_state.enemies_left = 5 + int(game_state.stage * 1.35)
-        game_state.enemies_left = 1
+        game_state.enemies_left = 5 + int(game_state.stage * 1.35)
         game_state.max_enemies = 2 + int(1.1 ** game_state.stage)
+
+        if (game_state.stage > game_state.max_stage):
+            game_state.max_stage = game_state.stage
 
         pygame.event.post(pygame.event.Event(pygame.USEREVENT, {"user_type": "STAGE_CHANGED", "stage": game_state.stage}))
 
